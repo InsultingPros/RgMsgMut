@@ -1,16 +1,21 @@
 class RgMsgMut extends Mutator
 	config(RgMsgMut);
 
-struct ZedStruct {
+
+struct ZedStruct
+{
 	var KFMonster Zed;
 	var float timeDamaged;
 };
 
-struct MsgStruct {
+
+struct MsgStruct
+{
 	var KFMonster Raged;
 	var string Msg;
 	var float timeShow;
 };
+
 
 const MSG_Delay = 0.05;
 
@@ -23,16 +28,21 @@ var config string MsgText;
 var config bool bScrakeMsg, bPoundMsg;
 var config color TColour, NColour, ZColour, WColour;
 
-static function FillPlayInfo(PlayInfo PlayInfo) {
+
+static function FillPlayInfo(PlayInfo PlayInfo)
+{
 	Super.FillPlayInfo(PlayInfo);
-	
+
 	PlayInfo.AddSetting("Rage Messages", "bPoundMsg", "Fleshpounds", 0, 0, "Check");
 	PlayInfo.AddSetting("Rage Messages", "bScrakeMsg", "Scrakes", 0, 0, "Check");
 	PlayInfo.AddSetting("Rage Messages", "MsgText", "Message", 255, 1, "Text", "64");
 }
 
-static event string GetDescriptionText(string Property) {
-	switch (Property) {
+
+static event string GetDescriptionText(string Property)
+{
+	switch (Property)
+	{
 		case "bPoundMsg":
 			return "Show a message when a fleshpound is raged.";
 		case "bScrakeMsg":
@@ -44,19 +54,21 @@ static event string GetDescriptionText(string Property) {
 	}
 }
 
-function PostBeginPlay() {
+
+function PostBeginPlay()
+{
 	local RgMsgRules GR;
-	
+
 	Super.PostBeginPlay();
-	
+
 	GR = Spawn(class'RgMsgRules');
 	GR.Mut = Self;
-	
+
 	if (Level.Game.GameRulesModifiers == None)
 		Level.Game.GameRulesModifiers = GR;
 	else
 		Level.Game.GameRulesModifiers.AddGameRules(GR);
-	
+
 	TCode = class'Engine.GameInfo'.static.MakeColorCode(TColour);
 	NCode = class'Engine.GameInfo'.static.MakeColorCode(NColour);
 	ZCode = class'Engine.GameInfo'.static.MakeColorCode(ZColour);
@@ -64,20 +76,24 @@ function PostBeginPlay() {
 }
 
 
-function bool CheckReplacement(Actor Other, out byte bSuperRelevant) {
+function bool CheckReplacement(Actor Other, out byte bSuperRelevant)
+{
 	local ZedStruct NewZed;
-	
-	if (ZombieScrake(Other) != None || ZombieFleshpound(Other) != None) {
+
+	if (ZombieScrake(Other) != None || ZombieFleshpound(Other) != None)
+	{
 		NewZed.Zed = KFMonster(Other);
 		LevelZeds[LevelZeds.length] = NewZed;
 	}
-		
+
 	return true;
 }
 
-function ScoreKill(Pawn Killed) {
+
+function ScoreKill(Pawn Killed)
+{
 	local int i;
-	
+
 	if (ZombieScrake(Killed) != None || ZombieFleshpound(Killed) != None) {
 		for (i = 0; i < LevelZeds.length; i++) {
 			if (LevelZeds[i].Zed == Killed) {
@@ -88,14 +104,18 @@ function ScoreKill(Pawn Killed) {
 	}
 }
 
-function bool ScrakeIsRaging(float aDiff, int aHealth, int aHealthMax, optional int aDamage) {
+
+function bool ScrakeIsRaging(float aDiff, int aHealth, int aHealthMax, optional int aDamage)
+{
 	return aDiff >= 5.0 && float(aHealth - aDamage) / aHealthMax < 0.75 || float(aHealth - aDamage) / aHealthMax < 0.5;
 }
 
-function bool IsStunned(KFMonster aMonster) {
+
+function bool IsStunned(KFMonster aMonster)
+{
 	local Name AnimName;
 	local float animFrame, animRate;
-	
+
 	aMonster.GetAnimParams(0, AnimName, animFrame, animRate);
 	if (AnimName == 'KnockDown')
 		return true;
@@ -103,35 +123,43 @@ function bool IsStunned(KFMonster aMonster) {
 		return false;
 }
 
-function bool ImminentRage(KFMonster aMonster, int aDamage) {
+
+function bool ImminentRage(KFMonster aMonster, int aDamage)
+{
 	local int twoSecondDamageTotal;
-	
-	if (ZombieScrake(aMonster) != None) {
+
+	if (ZombieScrake(aMonster) != None)
+	{
 		if (!bScrakeMsg || aMonster.health <= aDamage || aMonster.bDecapitated || ScrakeIsRaging(Level.Game.gameDifficulty, aMonster.health, aMonster.healthMax))
 			return false;
-		
+
 		return !IsStunned(aMonster) && ScrakeIsRaging(Level.Game.gameDifficulty, aMonster.health, aMonster.healthMax, aDamage);
 	}
-	else if (ZombieFleshpound(aMonster) != None) {
+
+	else if (ZombieFleshpound(aMonster) != None)
+	{
 		if (!bPoundMsg || aMonster.health <= aDamage || aMonster.bDecapitated || aMonster.bZapped || aMonster.bCrispified && aMonster.bBurnified || ZombieFleshpound(aMonster).bChargingPlayer || aMonster.IsInState('BeginRaging') || aMonster.IsInState('StartCharging') || aMonster.IsInState('RageCharging') || aMonster.IsInState('ChargeToMarker'))
 			return false;
-		
+
 		twoSecondDamageTotal = ZombieFleshpound(aMonster).twoSecondDamageTotal + aDamage;
 		if (twoSecondDamageTotal > ZombieFleshpound(aMonster).rageDamageThreshold)
 			return true;
 	}
-	
+
 	return false;
 }
 
-function bool DelayExceeded(Pawn Injured) {
+
+function bool DelayExceeded(Pawn Injured)
+{
 	local bool bExceeded;
 	local int i;
-	
+
 	if (ZombieFleshPound(Injured) == None)
 		return false;
-	
-	for (i = 0; i < LevelZeds.length; i++) {
+
+	for (i = 0; i < LevelZeds.length; i++)
+	{
 		if (LevelZeds[i].Zed == Injured) {
 			if (Level.timeSeconds - LevelZeds[i].timeDamaged > 0.07)
 				bExceeded = true;
@@ -140,28 +168,45 @@ function bool DelayExceeded(Pawn Injured) {
 			break;
 		}
 	}
-	
+
 	return bExceeded;
 }
 
-function string GetNameOf(Pawn Other) {
+
+function string GetNameOf(Pawn Other)
+{
 	local string OtherName;
 
 	if (Other == None)
 		return "Someone";
-	
+
 	if (Other.PlayerReplicationInfo != None)
-		return Other.PlayerReplicationInfo.PlayerName;
-	
+	{
+		OtherName = Other.PlayerReplicationInfo.PlayerName;
+		ReplaceText(OtherName, "^1", "");
+		ReplaceText(OtherName, "^2", "");
+		ReplaceText(OtherName, "^3", "");
+		ReplaceText(OtherName, "^4", "");
+		ReplaceText(OtherName, "^5", "");
+		ReplaceText(OtherName, "^6", "");
+		ReplaceText(OtherName, "^7", "");
+		ReplaceText(OtherName, "^8", "");
+		ReplaceText(OtherName, "^0", "");
+
+		return OtherName;
+	}	
+
 	if (Other.MenuName != "")
 		OtherName = Other.MenuName;
 	else
 		OtherName = string(Other.Class.Name);
-	
+
 	return OtherName;
 }
 
-function string GetItemNameOf(class<WeaponDamageType> aDamageType) {
+
+function string GetItemNameOf(class<WeaponDamageType> aDamageType)
+{
 	if (aDamageType == None)
 		return "something";
 	else if (aDamageType == class'KFMod.DamTypeDualies')
@@ -174,64 +219,101 @@ function string GetItemNameOf(class<WeaponDamageType> aDamageType) {
 		return "Hunting Shotgun";
 	else if (aDamageType == class'KFMod.DamTypeScythe')
 		return "Scythe";
-	
+
 	return aDamageType.default.WeaponClass.default.ItemName;
 }
 
-function string GetRageMessage(Pawn Injured, Pawn InstigatedBy, class<WeaponDamageType> DmgType) {
+
+function string GetRageMessage(Pawn Injured, Pawn InstigatedBy, class<WeaponDamageType> DmgType)
+{
 	local string Msg;
-	
+
 	Msg = TCode;
 	Msg $= Repl(MsgText, "%n", NCode $ GetNameOf(InstigatedBy) $ TCode);
 	Msg = Repl(Msg, "%z", ZCode $ GetNameOf(Injured) $ TCode);
 	Msg = Repl(Msg, "%w", WCode $ GetItemNameOf(DmgType) $ TCode);
-	
+
 	return Msg;
 }
 
-function DelayedRageMessage(Pawn Injured, Pawn InstigatedBy, class<WeaponDamageType> DmgType) {
+
+function DelayedRageMessage(Pawn Injured, Pawn InstigatedBy, class<WeaponDamageType> DmgType)
+{
 	Messages.Insert(0, 1);
 	Messages[0].Raged = KFMonster(Injured);
 	Messages[0].Msg = GetRageMessage(Injured, InstigatedBy, DmgType);
 	Messages[0].timeShow = Level.timeSeconds + MSG_Delay;
-	if (!bTimerSet) {
+	if (!bTimerSet)
+	{
 		bTimerSet = true;
 		SetTimer(MSG_Delay, false);
 	}
 }
 
-function BroadcastDelayedMessages() {
+
+function BroadcastDelayedMessages()
+{
 	local int i;
-	
-	for (i = Messages.length - 1; i >= 0; i--) {
+
+	for (i = Messages.length - 1; i >= 0; i--)
+	{
 		if (Messages[i].timeShow > Level.timeSeconds) {
 			bTimerSet = true;
 			SetTimer(Messages[i].timeShow - Level.timeSeconds, false);
 			break;
 		}
-		
+
 		if (Messages[i].Raged != None && !Messages[i].Raged.bDecapitated && !IsStunned(Messages[i].Raged))
-			Level.Game.Broadcast(Level.Game, Messages[i].Msg);
-		
+			BroadcastText(Messages[i].Msg);
+
 		Messages.Remove(i, 1);
 	}
 }
 
-function Timer() {
+
+// BroadcastText("something");
+function BroadcastText(string message)
+{
+	local Controller c;
+
+	for(c = level.controllerList; c != none; c = c.nextController)
+	{
+		if(PlayerController(c) != none)
+		{
+			// keep WebAdmin clean and shiny
+			if(c.PlayerReplicationInfo.PlayerName ~= "WebAdmin" && c.PlayerReplicationInfo.PlayerID == 0)
+			{
+				ReplaceText(message, NCode, "");
+				ReplaceText(message, ZCode, "");
+				ReplaceText(message, WCode, "");
+				ReplaceText(message, TCode, "");
+			}
+
+			PlayerController(c).teamMessage(none, message, 'RageMessages');
+		}
+	}
+}
+
+
+function Timer()
+{
 	bTimerSet = false;
 	BroadcastDelayedMessages();
 }
 
+
 defaultproperties
 {
-     MsgText="%n has raged %z with %w!"
-     bScrakeMsg=True
-     bPoundMsg=True
-     TColour=(B=255,G=255,R=255,A=255)
-     NColour=(B=255,G=120,R=120,A=255)
-     ZColour=(B=120,G=120,R=255,A=255)
-     WColour=(B=120,G=255,R=120,A=255)
-     GroupName="KFRgMsgMut"
-     FriendlyName="Rage Messages"
-     Description="Shows a message when a scrake or a fleshpound is raged."
+	 GroupName="KF-RgMsgMut"
+	 FriendlyName="Rage Messages"
+	 Description="Shows a message when a scrake or a fleshpound is raged."
+
+	 MsgText="%n has raged %z with %w!"
+	 bScrakeMsg=True
+	 bPoundMsg=True
+
+	 TColour=(B=255,G=255,R=255,A=255)
+	 NColour=(B=200,G=100,R=1,A=255)
+	 ZColour=(B=1,G=1,R=200,A=255)
+	 WColour=(B=1,G=200,R=1,A=255)
 }
