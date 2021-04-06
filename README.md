@@ -1,5 +1,7 @@
 # Rage Messages
 
+![GitHub all releases](https://img.shields.io/github/downloads/Insulting-Pros/RgMsgMut/total)
+
 Prints scrake, fleshpound rage info to player chat.
 
 ## Installation
