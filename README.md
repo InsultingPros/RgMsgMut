@@ -2,7 +2,7 @@
 
 ![GitHub all releases](https://img.shields.io/github/downloads/InsultingPros/RgMsgMut/total)
 
-Prints scrake, fleshpound rage info to player chat.
+Prints scrake, fleshpound rage info to player chat. Original version by [a1eat0r](https://forums.tripwireinteractive.com/index.php?threads/mutator-rage-messages.99328/).
 
 ## Installation
 
