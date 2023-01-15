@@ -1,6 +1,6 @@
 # Rage Messages
 
-![GitHub all releases](https://img.shields.io/github/downloads/InsultingPros/RgMsgMut/total)
+[![GitHub all releases](https://img.shields.io/github/downloads/InsultingPros/RgMsgMut/total)](https://github.com/InsultingPros/RgMsgMut/releases)
 
 Prints scrake, fleshpound rage info to player chat. Original version by [a1eat0r](https://forums.tripwireinteractive.com/index.php?threads/mutator-rage-messages.99328/).
 
