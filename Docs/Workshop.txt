@@ -1,0 +1,16 @@
+[h1][b]General Information[/b][/h1]
+Tactical nuclear, antized gun 💀 Cut from [url=https://github.com/InsultingPros/WTF]WTF mod[/url] old versions.
+I don't own this and all rights belong to their respectful creators.
+
+[h2][b]Mutator Classname:[/b][/h2]
+[code]
+MRLWTF.MutMRWTF
+[/code]
+
+[h2][b]Pickup Class:[/b][/h2]
+[code]
+MRLWTF.RocketLauncherPickup
+[/code]
+
+[h2][b]Download Link for Lazy Admins:[/b][/h2]
+[url=https://github.com/InsultingPros/MRLWTF/releases]Github[/url]
